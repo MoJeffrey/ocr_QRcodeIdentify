@@ -1,3 +1,5 @@
+import logging
+
 import cv2
 import threading
 
@@ -5,6 +7,7 @@ import threading
 class RTSCapture(cv2.VideoCapture):
     _cur_frame = None
     _reading = False
+    __logger = logging.getLogger('RTSCapture')
     schemes = []
     frame_receiver = None
     read_latest_frame = None
@@ -42,6 +45,12 @@ class RTSCapture(cv2.VideoCapture):
     def start_read(self):
         self.frame_receiver.start()
         self.read_latest_frame = self.read2 if self._reading else self.read
+
+        RTSCapture.__logger.info(f'已初始化摄像头及二维码检测器')
+
+        if not self.isStarted():
+            RTSCapture.__logger.error("摄像头未能正确启动！")
+            exit(0)
 
     def stop_read(self):
         self._reading = False

@@ -29,6 +29,7 @@ class config(object):
     API_URL: str = None
     API_URL_PORT: int = None
     API_TIMEOUT: str = None
+    API_WEBSOCKET_URL: str = None
 
     """
     OTHER
@@ -155,11 +156,13 @@ class config(object):
         config.API_URL = APIConfig['URL']
         config.API_URL_PORT = APIConfig.getint('URL_PORT')
         config.API_TIMEOUT = APIConfig.getint('TIMEOUT')
+        config.API_WEBSOCKET_URL = APIConfig.get('WEBSOCKET_URL')
 
         config.API_URL_IP = os.environ.get('API_URL_IP', config.API_URL_IP)
         config.API_URL = os.environ.get('API_URL', config.API_URL)
         config.API_URL_PORT = os.environ.get('API_URL_PORT', config.API_URL_PORT)
         config.API_TIMEOUT = os.environ.get('API_TIMEOUT', config.API_TIMEOUT)
+        config.API_WEBSOCKET_URL = os.environ.get('API_WEBSOCKET_URL', config.API_WEBSOCKET_URL)
 
     def __Analyze_OTHER(self) -> None:
         """

@@ -20,18 +20,18 @@ class QuestionsDTO:
         pass
 
     def identify(self):
-        try:
-            # 开始截取问题编号及片段编号
-            self.match_name = re.search(r'\[([^]]+)_', self.result).group(1)  # 问题编号
-            self.data_all_num = int(re.search(r'\[(.*?)&(\d+)]', self.result).group(2))  # 片段总数
-            self.curr_num = int(re.search(r'_(\d+)&', self.result).group(1))  # 当前片段号
-            self.logger.info(f'已截取问题编号及片段编号')
-            return None
+        self.match_name = re.search(r'[QA]\d+', self.result).group()
+        self.data_all_num = int(re.search(r'\[[AQ]\d+_\d+_(\d+)]', self.result).group(1))
+        self.curr_num = int(re.search(r'\[[AQ]\d+_(\d+)_\d+]', self.result).group(1))
+        self.logger.info(f'已截取问题编号及片段编号')
 
-        except Exception as e:
-            print(f"未知信息: {e}")
-            # http上传请求，将不分段的数据直接上传
-            http_upload = HttpUpload(config.API_URL_IP, config.API_URL_PORT)
-            response_data = http_upload.upload_data(config.API_URL, self.result)
-            self.logger.info(f"不分段上传的请求结果: {response_data}")
-            return self.result
+    @staticmethod
+    def splicing(current_data_list: list) -> str:
+        sorted_data = sorted(current_data_list, key=lambda x: int(re.search(r'\[[AQ]\d+_(\d+)_\d+]', x).group(1)))
+        return ''.join([d[d.index(']') + 1:] for d in sorted_data])
+
+if __name__ == '__main__':
+
+    text = ['[Q000000032_1_1]{"url": "/question/user/getinfo", "headers": [], "method": "POST", "data": {"address": true}, "action": "transponder"}']
+    a = QuestionsDTO.splicing(text)
+    print(a)

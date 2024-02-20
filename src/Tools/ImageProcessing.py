@@ -17,6 +17,11 @@ class ImageProcessing:
         ImageProcessing.save(self.__img, fileName)
 
     @staticmethod
+    def readImg(fileName: str):
+        frame_path = os.path.join(config.FRAME_FOLDER_PHAT, fileName)
+        return cv2.imread(frame_path)
+
+    @staticmethod
     def save(img, fileName: str = None) -> None:
         current_time = datetime.now().strftime("%Y%m%d%H%M%S.%f")
 
