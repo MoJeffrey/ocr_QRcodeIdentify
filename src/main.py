@@ -32,6 +32,13 @@ def Init():
 
 # 对码进行循环识别
 def identify(result, Num):
+    """
+    对识别后的二维码进行Redis 比对
+    比对成功后转发给后端
+    :param result: 二维码 识别后的String 数据
+    :param Num: 第多少张二维码。 方便bug追踪
+    :return:
+    """
     logger = logging.getLogger('对码识别')
     logger.info = passFun
 
@@ -41,24 +48,26 @@ def identify(result, Num):
     question = QuestionsDTO(result)
     question.identify()
 
+    redis = RedisTool()
     # 对问题编号进行判断，如果不存在，则进行存储，用于后续的判断
-    if not RedisTool.exists(question.match_name):
-        RedisTool.set(question.match_name, json.dumps([]))
+    if not redis.exists(question.match_name):
+        redis.set(question.match_name, json.dumps([]))
 
-    current_data = json.loads(RedisTool.get(question.match_name))
+    current_data = json.loads(redis.get(question.match_name))
     if result in current_data:
-        return
+        return None
 
     current_data.append(result)
-    RedisTool.set(question.match_name, json.dumps(current_data))
+    redis.set(question.match_name, json.dumps(current_data))
 
-    if len(current_data) != question.data_all_num:
-        return
+    # 数据拼接
+    if len(current_data) == question.data_all_num:
+        data = QuestionsDTO.splicing(current_data)
+        data = json.loads(data)
+        data['code'] = question.match_name
+        websocketClient.send(data)
 
-    data = QuestionsDTO.splicing(current_data)
-    data = json.loads(data)
-    data['code'] = question.match_name
-    websocketClient.send(data)
+    return result
 
 
 # 开始识别帧中二维码
@@ -125,8 +134,7 @@ def main():
     for i in range(codeNum):
         QRCoderList.append(QRCoder())
 
-    RedisTool()
-    RedisTool.connect()
+    RedisTool.Init()
     CameraRun(logger, QRCoderList)
     # ImgRun(logger, QRCoderList)
 
