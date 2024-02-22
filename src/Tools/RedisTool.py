@@ -25,7 +25,7 @@ class RedisConnectDTO:
             "db": self.db,
             "password": self.password,
             "socket_timeout": self.socket_timeout,
-            "max_connections": 10,
+            "max_connections": config.Sys_MAX_WORKER,
         }
 
 

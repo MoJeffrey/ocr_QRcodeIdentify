@@ -93,7 +93,6 @@ class config(object):
         else:
             self.__CONFIG_PATH = ConfigFile
 
-        print(os.getcwd())
         if os.path.exists(self.__CONFIG_PATH):
             self.__File = configparser.ConfigParser()
             self.__File.read(self.__CONFIG_PATH, encoding="utf-8")
@@ -131,6 +130,7 @@ class config(object):
         self.__Analyze_API()
         self.__Analyze_OTHER()
         self.__Analyze_REDIS()
+        self.__Analyze_Sys()
         self.__Analyze_IMG()
 
     def __Analyze_RTSP(self) -> None:
@@ -205,7 +205,7 @@ class config(object):
 
     def __Analyze_Sys(self) -> None:
         SysConfig = self.__File['Sys']
-        config.Sys_LOG_INFO = SysConfig.getint('LOG_INFO')
+        config.Sys_LOG_INFO = SysConfig.getboolean('LOG_INFO')
         config.Sys_MAX_WORKER = SysConfig.getint('MAX_WORKER')
 
         config.Sys_LOG_INFO = bool(os.environ.get('Sys_LOG_INFO', config.Sys_LOG_INFO))

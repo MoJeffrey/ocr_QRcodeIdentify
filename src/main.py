@@ -6,6 +6,7 @@ import time
 import json
 from concurrent.futures import ThreadPoolExecutor
 
+from Thread.Ocr_ThreadPoolExecutor import OCR_ThreadPoolExecutor
 from Tools.QRCoder import QRCoder
 from Tools.RedisTool import RedisTool
 from Tools.config import config
@@ -59,7 +60,6 @@ def identify(result, Num):
 
     current_data.append(result)
     redis.set(question.match_name, json.dumps(current_data))
-
     # 数据拼接
     if len(current_data) == question.data_all_num:
         data = QuestionsDTO.splicing(current_data)
@@ -78,6 +78,9 @@ def qr_read(img, Num, coder: QRCoder):
         # 判断二维码数据，如果二维码数据为空
         if result is None:
             return
+
+        # if OCR_ThreadPoolExecutor.exist(result):
+        #     return
 
         identify(result, Num)
     except Exception as e:
@@ -99,7 +102,7 @@ def CameraRun(logger, QRCoderList):
     :param QRCoderList:
     :return:
     """
-    executor = ThreadPoolExecutor(max_workers=config.Sys_MAX_WORKER)
+    OCR_ThreadPoolExecutor.Init()
     camera = RTSCapture.create(int(config.RTSP_URLS[0]), 'rtsp')
     camera.start_read()
 
@@ -110,16 +113,16 @@ def CameraRun(logger, QRCoderList):
             if not ok or img is None:
                 continue
 
-            ImageP = ImageProcessing(img)
+            ImageP = ImageProcessing(img, str(Num))
             ImgList = ImageP.partition()
 
             codeIndex = 0
             for img in ImgList:
-                executor.submit(qr_read, img, Num, QRCoderList[codeIndex])
+                OCR_ThreadPoolExecutor.RunTask(qr_read, img, Num, QRCoderList[codeIndex])
                 codeIndex += 1
-                Num += 1
-            time.sleep(config.OTHER_PAUSE_TIME)
 
+            time.sleep(config.OTHER_PAUSE_TIME)
+            Num += 1
         except Exception as e:
             logger.error(e)
             logger.error(traceback.print_exc())
@@ -128,10 +131,10 @@ def CameraRun(logger, QRCoderList):
 def main():
     Init()
     logger = logging.getLogger('主线程')
-    codeNum = config.IMG_WIDTH_QUANTITY * config.IMG_HIGH_QUANTITY
 
     QRCoderList = []
-    for i in range(codeNum):
+    print(config.Sys_MAX_WORKER)
+    for i in range(config.Sys_MAX_WORKER):
         QRCoderList.append(QRCoder())
 
     RedisTool.Init()
