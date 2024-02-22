@@ -10,6 +10,7 @@ class OCR_ThreadPoolExecutor:
     __executor = None
     __lock = None
 
+    __result_dict = None
     __resultSet = None
 
     @staticmethod
@@ -17,6 +18,7 @@ class OCR_ThreadPoolExecutor:
         OCR_ThreadPoolExecutor.__executor = ThreadPoolExecutor(max_workers=max_workers)
         OCR_ThreadPoolExecutor.__lock = threading.Lock()
         OCR_ThreadPoolExecutor.__resultSet = SortedSet()
+        OCR_ThreadPoolExecutor.__result_dict = {}
 
     @staticmethod
     def RunTask(*args):
@@ -33,3 +35,15 @@ class OCR_ThreadPoolExecutor:
             logging.error(f"数量: {len(OCR_ThreadPoolExecutor.__resultSet)}")
             OCR_ThreadPoolExecutor.__lock.release()
             return False
+
+    @staticmethod
+    def AddResult(result: str, code: str):
+        OCR_ThreadPoolExecutor.__lock.acquire()
+        if code not in OCR_ThreadPoolExecutor.__result_dict:
+            OCR_ThreadPoolExecutor.__result_dict[code] = []
+
+        OCR_ThreadPoolExecutor.__result_dict[code].append(result)
+
+        data = OCR_ThreadPoolExecutor.__result_dict[code]
+        OCR_ThreadPoolExecutor.__lock.release()
+        return data

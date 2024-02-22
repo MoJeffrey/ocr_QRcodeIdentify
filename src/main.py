@@ -49,17 +49,19 @@ def identify(result, Num):
     question = QuestionsDTO(result)
     question.identify()
 
-    redis = RedisTool()
-    # 对问题编号进行判断，如果不存在，则进行存储，用于后续的判断
-    if not redis.exists(question.match_name):
-        redis.set(question.match_name, json.dumps([]))
+    # redis = RedisTool()
+    # # 对问题编号进行判断，如果不存在，则进行存储，用于后续的判断
+    # if not redis.exists(question.match_name):
+    #     redis.set(question.match_name, json.dumps([]))
+    #
+    # current_data = json.loads(redis.get(question.match_name))
+    # if result in current_data:
+    #     return None
+    #
+    # current_data.append(result)
+    # redis.set(question.match_name, json.dumps(current_data))
 
-    current_data = json.loads(redis.get(question.match_name))
-    if result in current_data:
-        return None
-
-    current_data.append(result)
-    redis.set(question.match_name, json.dumps(current_data))
+    current_data = OCR_ThreadPoolExecutor.AddResult(result, question.match_name)
     # 数据拼接
     if len(current_data) == question.data_all_num:
         data = QuestionsDTO.splicing(current_data)
@@ -79,8 +81,8 @@ def qr_read(img, Num, coder: QRCoder):
         if result is None:
             return
 
-        # if OCR_ThreadPoolExecutor.exist(result):
-        #     return
+        if OCR_ThreadPoolExecutor.exist(result):
+            return
 
         identify(result, Num)
     except Exception as e:
