@@ -1,4 +1,5 @@
 import re
+import threading
 import traceback
 
 import logging
@@ -49,18 +50,6 @@ def identify(result, Num):
     question = QuestionsDTO(result)
     question.identify()
 
-    # redis = RedisTool()
-    # # 对问题编号进行判断，如果不存在，则进行存储，用于后续的判断
-    # if not redis.exists(question.match_name):
-    #     redis.set(question.match_name, json.dumps([]))
-    #
-    # current_data = json.loads(redis.get(question.match_name))
-    # if result in current_data:
-    #     return None
-    #
-    # current_data.append(result)
-    # redis.set(question.match_name, json.dumps(current_data))
-
     current_data = OCR_ThreadPoolExecutor.AddResult(result, question.match_name)
     # 数据拼接
     if len(current_data) == question.data_all_num:
@@ -97,18 +86,22 @@ def ImgRun(logger, QRCoderList):
     websocketClient.Stop()
 
 
-def CameraRun(logger, QRCoderList):
+def CameraRun(logger, RTSP_URL: int):
     """
     驱动摄像头 获取图片
     :param logger:
-    :param QRCoderList:
+    :param RTSP_URL:
     :return:
     """
-    OCR_ThreadPoolExecutor.Init()
-    camera = RTSCapture.create(int(config.RTSP_URLS[0]), 'rtsp')
-    camera.start_read()
+    camera = RTSCapture.create(RTSP_URL, 'rtsp')
+    camera.start_read(RTSP_URL)
+
+    QRCoderList = []
+    for i in range(config.Sys_MAX_WORKER):
+        QRCoderList.append(QRCoder())
 
     Num = 0
+    codeIndex = 0
     while True:
         try:
             ok, img = camera.read_latest_frame()
@@ -118,29 +111,27 @@ def CameraRun(logger, QRCoderList):
             ImageP = ImageProcessing(img, str(Num))
             ImgList = ImageP.partition()
 
-            codeIndex = 0
             for img in ImgList:
-                OCR_ThreadPoolExecutor.RunTask(qr_read, img, Num, QRCoderList[codeIndex])
+                OCR_ThreadPoolExecutor.RunTask(qr_read, img, Num, QRCoderList[codeIndex % config.Sys_MAX_WORKER])
                 codeIndex += 1
 
-            time.sleep(config.OTHER_PAUSE_TIME)
             Num += 1
+
         except Exception as e:
-            logger.error(e)
-            logger.error(traceback.print_exc())
+            logger.error(f'通道{RTSP_URL} {e}')
+            logger.error(f'通道{RTSP_URL} {traceback.print_exc()}')
 
 
 def main():
     Init()
     logger = logging.getLogger('主线程')
 
-    QRCoderList = []
-    print(config.Sys_MAX_WORKER)
-    for i in range(config.Sys_MAX_WORKER):
-        QRCoderList.append(QRCoder())
+    OCR_ThreadPoolExecutor.Init()
+    # CameraRun(logger, int(config.RTSP_URLS[1]))
+    for i in config.RTSP_URLS:
+        thread = threading.Thread(target=CameraRun, args=(logger, int(i),))
+        thread.start()
 
-    RedisTool.Init()
-    CameraRun(logger, QRCoderList)
     # ImgRun(logger, QRCoderList)
 
 

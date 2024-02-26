@@ -25,6 +25,14 @@ class OCR_ThreadPoolExecutor:
         OCR_ThreadPoolExecutor.__executor.submit(*args)
 
     @staticmethod
+    def GetResultSet():
+        return OCR_ThreadPoolExecutor.__resultSet
+
+    @staticmethod
+    def GetResultDict():
+        return OCR_ThreadPoolExecutor.__result_dict
+
+    @staticmethod
     def exist(result: str) -> bool:
         OCR_ThreadPoolExecutor.__lock.acquire()
         if result in OCR_ThreadPoolExecutor.__resultSet:
@@ -32,9 +40,15 @@ class OCR_ThreadPoolExecutor:
             return True
         else:
             OCR_ThreadPoolExecutor.__resultSet.add(result)
-            logging.error(f"数量: {len(OCR_ThreadPoolExecutor.__resultSet)}")
             OCR_ThreadPoolExecutor.__lock.release()
             return False
+
+    @staticmethod
+    def removeSet(results: list):
+        OCR_ThreadPoolExecutor.__lock.acquire()
+        for i in results:
+            OCR_ThreadPoolExecutor.__resultSet.remove(i)
+        OCR_ThreadPoolExecutor.__lock.release()
 
     @staticmethod
     def AddResult(result: str, code: str):
@@ -45,5 +59,13 @@ class OCR_ThreadPoolExecutor:
         OCR_ThreadPoolExecutor.__result_dict[code].append(result)
 
         data = OCR_ThreadPoolExecutor.__result_dict[code]
+        OCR_ThreadPoolExecutor.__lock.release()
+        return data
+
+    @staticmethod
+    def DeleteResult(code: str):
+        OCR_ThreadPoolExecutor.__lock.acquire()
+        data = OCR_ThreadPoolExecutor.__result_dict[code]
+        del OCR_ThreadPoolExecutor.__result_dict[code]
         OCR_ThreadPoolExecutor.__lock.release()
         return data

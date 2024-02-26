@@ -5,6 +5,7 @@ import time
 
 import websocket
 
+from Thread.Ocr_ThreadPoolExecutor import OCR_ThreadPoolExecutor
 from Tools.config import config
 
 
@@ -37,7 +38,13 @@ class websocketClient:
 
     @staticmethod
     def on_message(ws, message):
-        pass
+        logging.info(f"on_message: {message}")
+        data = json.loads(message)
+        code = data["code"]
+        if data["action"] == "delete":
+            Results = OCR_ThreadPoolExecutor.DeleteResult(code)
+            OCR_ThreadPoolExecutor.removeSet(Results)
+            logging.info(f"{OCR_ThreadPoolExecutor.GetResultDict()}")
 
     @staticmethod
     def on_error(ws, error):
