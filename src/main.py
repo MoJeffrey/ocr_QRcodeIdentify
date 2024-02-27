@@ -1,15 +1,11 @@
-import re
 import threading
 import traceback
 
 import logging
-import time
 import json
-from concurrent.futures import ThreadPoolExecutor
 
 from Thread.Ocr_ThreadPoolExecutor import OCR_ThreadPoolExecutor
 from Tools.QRCoder import QRCoder
-from Tools.RedisTool import RedisTool
 from Tools.config import config
 from Tools.questionsDTO import QuestionsDTO
 from Tools.ImageProcessing import ImageProcessing
@@ -73,6 +69,7 @@ def qr_read(img, Num, coder: QRCoder):
         if OCR_ThreadPoolExecutor.exist(result):
             return
 
+        logging.info(f"数量 {len(OCR_ThreadPoolExecutor.GetResultSet())}")
         identify(result, Num)
     except Exception as e:
         logging.error(f'{e}')
@@ -80,9 +77,9 @@ def qr_read(img, Num, coder: QRCoder):
     return
 
 
-def ImgRun(logger, QRCoderList):
-    img = ImageProcessing.readImg('Q000000001_1_1.jpg')
-    qr_read(img, 1, QRCoderList[0])
+def ImgRun(logger):
+    img = ImageProcessing.readImg('A000000001_1_116.jpg')
+    qr_read(img, 1, QRCoder())
     websocketClient.Stop()
 
 
@@ -132,7 +129,7 @@ def main():
         thread = threading.Thread(target=CameraRun, args=(logger, int(i),))
         thread.start()
 
-    # ImgRun(logger, QRCoderList)
+    # ImgRun(logger)
 
 
 # main方法

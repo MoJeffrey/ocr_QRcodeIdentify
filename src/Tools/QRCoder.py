@@ -1,5 +1,7 @@
 import cv2
 
+from Tools.ImageProcessing import ImageProcessing
+
 
 class QRCoder(object):
     coder = None
@@ -18,6 +20,7 @@ class QRCoder(object):
 
     def qrRead(self, img):
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        ImageProcessing.save(gray, '测试')
         results = self.coder.detectAndDecode(gray)[0]
         if len(results) == 0:
             return None
