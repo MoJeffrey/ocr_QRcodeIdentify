@@ -109,6 +109,7 @@ def CameraRun(logger, RTSP_URL: int):
             ImgList = ImageP.partition()
 
             for img in ImgList:
+                ImageProcessing.save(img, str(codeIndex))
                 OCR_ThreadPoolExecutor.RunTask(qr_read, img, Num, QRCoderList[codeIndex % config.Sys_MAX_WORKER])
                 codeIndex += 1
 
