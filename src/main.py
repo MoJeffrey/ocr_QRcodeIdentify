@@ -62,14 +62,12 @@ def qr_read(img, Num, coder: QRCoder):
     try:
         result = coder.qrRead(img)
 
-        # 判断二维码数据，如果二维码数据为空
         if result is None:
             return
 
         if OCR_ThreadPoolExecutor.exist(result):
             return
 
-        logging.info(f"数量 {len(OCR_ThreadPoolExecutor.GetResultSet())}")
         identify(result, Num)
     except Exception as e:
         logging.error(f'{e}')
@@ -125,7 +123,6 @@ def main():
     logger = logging.getLogger('主线程')
 
     OCR_ThreadPoolExecutor.Init()
-    # CameraRun(logger, int(config.RTSP_URLS[1]))
     for i in config.RTSP_URLS:
         thread = threading.Thread(target=CameraRun, args=(logger, int(i),))
         thread.start()

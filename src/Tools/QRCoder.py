@@ -17,17 +17,16 @@ class QRCoder(object):
             self.coder = WeChatQRCode
 
     @staticmethod
-    def Has_Color(img, lower_range, upper_range):
+    def Has_Color(hsv_img, lower_range, upper_range):
         """
         HSV颜色空间
         判断图片是否有该颜色范围
-        :param img:
+        :param hsv_img:
         :param lower_range:
         :param upper_range:
         :return:
         """
-        hsv_image = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        green_mask = cv2.inRange(hsv_image, lower_range, upper_range)
+        green_mask = cv2.inRange(hsv_img, lower_range, upper_range)
         white_pixels = cv2.countNonZero(green_mask)
         threshold = 1000
         return white_pixels > threshold
@@ -37,6 +36,7 @@ class QRCoder(object):
 
     def qrRead(self, img):
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         results = self.coder.detectAndDecode(gray)[0]
         if len(results) == 0:
             return None
