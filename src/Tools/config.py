@@ -56,6 +56,7 @@ class config(object):
     """
     IMG
     """
+    IMG_QRCODE_MODEL_PATH: str = None
     IMG_HIGH_QUANTITY: int = None
     IMG_WIDTH_QUANTITY: int = None
     IMG_SHOW: bool = None
@@ -197,11 +198,13 @@ class config(object):
         config.IMG_WIDTH_QUANTITY = IMGConfig.getint('WIDTH_QUANTITY')
         config.IMG_SHOW = IMGConfig.getboolean('SHOW')
         config.IMG_SAVE = IMGConfig.getboolean('SAVE')
+        config.IMG_QRCODE_MODEL_PATH = IMGConfig.get('QRCODE_MODEL_PATH')
 
         config.IMG_HIGH_Quantity = int(os.environ.get('IMG_HIGH_QUANTITY', config.IMG_HIGH_QUANTITY))
         config.IMG_WIDTH_Quantity = int(os.environ.get('IMG_WIDTH_QUANTITY', config.IMG_WIDTH_QUANTITY))
         config.IMG_SHOW = bool(os.environ.get('IMG_SHOW', config.IMG_SHOW))
         config.IMG_SAVE = bool(os.environ.get('IMG_SAVE', config.IMG_SAVE))
+        config.IMG_QRCODE_MODEL_PATH = os.environ.get('IMG_QRCODE_MODEL_PATH', config.IMG_QRCODE_MODEL_PATH)
 
     def __Analyze_Sys(self) -> None:
         SysConfig = self.__File['Sys']

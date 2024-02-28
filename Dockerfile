@@ -5,13 +5,15 @@ FROM python:3.8
 WORKDIR /app/lib
 COPY ./requirements.txt ./
 
-# 安装所需的依赖
+RUN sed -i 's|http://deb.debian.org/debian|http://mirrors.aliyun.com/debian|g' /etc/apt/sources.list
+RUN sed -i 's|http://security.debian.org/debian-security|http://mirrors.aliyun.com/debian-security|g' /etc/apt/sources.list
+RUN apt-get update && apt-get install -y libgl1-mesa-glx
+
+RUN pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
+
 RUN pip install -r requirements.txt
-RUN pip uninstall -y opencv-python
-RUN pip install opencv-python-headless
 
-ENV CONFIG_PATH = /app/src/config.ini
-
+ENV CONFIG_PATH="/app/src/config.ini"
 # 设置环境变量
 ENV PATH="/app/lib:${PATH}"
 

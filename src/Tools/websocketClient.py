@@ -42,6 +42,7 @@ class websocketClient:
         data = json.loads(message)
         code = data["code"]
         if data["action"] == "delete":
+            return
             Results = OCR_ThreadPoolExecutor.DeleteResult(code)
             OCR_ThreadPoolExecutor.removeSet(Results)
             logging.info(f"{OCR_ThreadPoolExecutor.GetResultDict()}")
