@@ -37,6 +37,11 @@ class QRCoder(object):
     def qrRead(self, img):
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+        # 如果是绿色 则直接退出
+        if QRCoder.Has_Color(hsv, (40, 40, 40), (80, 255, 255)):
+            return None
+
         results = self.coder.detectAndDecode(gray)[0]
         if len(results) == 0:
             return None

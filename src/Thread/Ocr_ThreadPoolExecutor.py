@@ -21,6 +21,13 @@ class OCR_ThreadPoolExecutor:
         OCR_ThreadPoolExecutor.__result_dict = {}
 
     @staticmethod
+    def ReSetData():
+        OCR_ThreadPoolExecutor.__lock.acquire()
+        OCR_ThreadPoolExecutor.__resultSet = SortedSet()
+        OCR_ThreadPoolExecutor.__result_dict = {}
+        OCR_ThreadPoolExecutor.__lock.release()
+
+    @staticmethod
     def RunTask(*args):
         OCR_ThreadPoolExecutor.__executor.submit(*args)
 

@@ -12,6 +12,7 @@ class QuestionsDTO:
     def __init__(self, result):
         self.result = result
         self.logger.info = self.passInfo
+        self.identify()
 
     def passInfo(self, msg):
         pass

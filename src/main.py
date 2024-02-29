@@ -19,6 +19,7 @@ def passFun(*obj):
 
 def Init():
     config().Init()
+    OCR_ThreadPoolExecutor.Init()
     websocketClient.Init()
 
     if not config.IMG_SHOW:
@@ -39,22 +40,12 @@ def identify(result, Num):
     """
     logger = logging.getLogger('对码识别')
     logger.info = passFun
-
-    # 对识别的结果进行编号截取及格式转换
     logger.info(f'识别结果 = {result}')
 
+    websocketClient.send(result)
     question = QuestionsDTO(result)
-    question.identify()
-
-    current_data = OCR_ThreadPoolExecutor.AddResult(result, question.match_name)
-    # 数据拼接
-    if len(current_data) == question.data_all_num:
-        data = QuestionsDTO.splicing(current_data)
-        data = json.loads(data)
-        data['code'] = question.match_name
-        websocketClient.send(data)
-
-    return result
+    OCR_ThreadPoolExecutor.AddResult(result, question.match_name)
+    return
 
 
 # 开始识别帧中二维码
@@ -68,6 +59,7 @@ def qr_read(img, Num, coder: QRCoder):
         if OCR_ThreadPoolExecutor.exist(result):
             return
 
+        logging.info(f"识别数量:{len(OCR_ThreadPoolExecutor.GetResultSet())}")
         identify(result, Num)
     except Exception as e:
         logging.error(f'{e}')
@@ -121,8 +113,6 @@ def CameraRun(logger, RTSP_URL: int):
 def main():
     Init()
     logger = logging.getLogger('主线程')
-
-    OCR_ThreadPoolExecutor.Init()
     for i in config.RTSP_URLS:
         thread = threading.Thread(target=CameraRun, args=(logger, int(i),))
         thread.start()
