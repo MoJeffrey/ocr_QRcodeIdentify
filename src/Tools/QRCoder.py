@@ -1,4 +1,9 @@
+import logging
+import traceback
+
 import cv2
+
+from Enum.HSVColorEnum import HSVColorEnum
 
 
 class QRCoder(object):
@@ -39,10 +44,14 @@ class QRCoder(object):
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
         # 如果是绿色 则直接退出
-        if QRCoder.Has_Color(hsv, (40, 40, 40), (80, 255, 255)):
+        if QRCoder.Has_Color(hsv, HSVColorEnum.Green.value.lower, HSVColorEnum.Green.value.upper):
             return None
 
-        results = self.coder.detectAndDecode(gray)[0]
+        try:
+            results = self.coder.detectAndDecode(gray)[0]
+        except Exception as e:
+            return None
+
         if len(results) == 0:
             return None
 

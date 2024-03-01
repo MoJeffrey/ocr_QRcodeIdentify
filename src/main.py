@@ -49,7 +49,7 @@ def identify(result, Num):
 
 
 # 开始识别帧中二维码
-def qr_read(img, Num, coder: QRCoder):
+def qr_read(img, Num, coder: QRCoder, QRCoderIndex: int):
     try:
         result = coder.qrRead(img)
 
@@ -63,6 +63,7 @@ def qr_read(img, Num, coder: QRCoder):
         identify(result, Num)
     except Exception as e:
         logging.error(f'{e}')
+        logging.error(f'编号：{Num} =》 {traceback.print_exc()} => {QRCoderIndex}')
 
     return
 
@@ -98,10 +99,12 @@ def CameraRun(logger, RTSP_URL: int):
             ImageP = ImageProcessing(img, str(Num))
             ImgList = ImageP.partition()
 
+            imgIndex = 0
             for img in ImgList:
-                ImageProcessing.save(img, str(codeIndex))
-                OCR_ThreadPoolExecutor.RunTask(qr_read, img, Num, QRCoderList[codeIndex % config.Sys_MAX_WORKER])
+                # ImageProcessing.save(img, str(codeIndex))
+                OCR_ThreadPoolExecutor.RunTask(qr_read, img, Num, QRCoderList[codeIndex % config.Sys_MAX_WORKER], codeIndex % config.Sys_MAX_WORKER)
                 codeIndex += 1
+                imgIndex += 1
 
             Num += 1
 

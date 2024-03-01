@@ -1,4 +1,5 @@
 import json
+import logging
 import threading
 import time
 
@@ -32,13 +33,17 @@ class websocketClient:
 
     @staticmethod
     def send(msg):
-        websocketClient.__client.send(msg)
+        try:
+            websocketClient.__client.send(msg)
+        except Exception as E:
+            pass
 
     @staticmethod
     def on_message(ws, message):
         data = json.loads(message)
         code = data["code"]
         if data["action"] == "delete":
+            logging.info(f"收到数据 {message}")
             Results = OCR_ThreadPoolExecutor.DeleteResult(code)
             OCR_ThreadPoolExecutor.removeSet(Results)
 
