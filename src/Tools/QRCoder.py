@@ -2,6 +2,7 @@ import logging
 import traceback
 
 import cv2
+from Tools.config import config
 
 from Enum.HSVColorEnum import HSVColorEnum
 
@@ -12,10 +13,10 @@ class QRCoder(object):
     def __init__(self, WeChatQRCode=None):
         if WeChatQRCode is None:
             param = {
-                "detector_prototxt_path": "src/caffe/detect.prototxt",
-                "detector_caffe_model_path": "src/caffe/detect.caffemodel",
-                "super_resolution_prototxt_path": "src/caffe/sr.prototxt",
-                "super_resolution_caffe_model_path": "src/caffe/sr.caffemodel"
+                "detector_prototxt_path": f"{config.IMG_QRCODE_MODEL_PATH}detect.prototxt",
+                "detector_caffe_model_path": f"{config.IMG_QRCODE_MODEL_PATH}detect.caffemodel",
+                "super_resolution_prototxt_path": f"{config.IMG_QRCODE_MODEL_PATH}sr.prototxt",
+                "super_resolution_caffe_model_path": f"{config.IMG_QRCODE_MODEL_PATH}sr.caffemodel"
             }
             self.coder = cv2.wechat_qrcode.WeChatQRCode(**param)
         else:
