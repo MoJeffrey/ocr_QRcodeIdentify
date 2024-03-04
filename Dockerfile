@@ -4,6 +4,7 @@ FROM python:3.8
 # 设置工作目录
 WORKDIR /app/lib
 COPY ./requirements.txt ./
+COPY ./requirements.txt /etc/apt/sources.list
 
 # 安装所需的依赖
 RUN sed -i 's|http://deb.debian.org/debian|http://mirrors.aliyun.com/debian|g' /etc/apt/sources.list
