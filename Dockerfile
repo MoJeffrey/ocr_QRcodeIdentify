@@ -12,7 +12,7 @@ RUN sed -i 's|http://security.debian.org/debian-security|http://mirrors.aliyun.c
 
 RUN apt-get update && apt-get install -y libgl1-mesa-glx
 
-pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
+RUN pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
 RUN pip install -r requirements.txt
 ENV CONFIG_PATH=/app/src/config.ini
 
