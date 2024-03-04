@@ -5,7 +5,7 @@ docker build -t ocr-qrcode-identify .
 
 ### 启动
 ```shell
-docker run -itd --name test-python --device=/dev/bus/usb:/dev/bus/usb --privileged -v /home/lougang/ocr/src:/app/src ocr-qrcode-identify
+docker run -itd --name test-python --device=/dev/bus/usb:/dev/bus/usb --privileged -v /home/lougang/python-business/src:/app/src ocr-qrcode-identify
 ```
 
 ### 进入
