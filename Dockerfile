@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y libgl1-mesa-glx
 
 pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
 RUN pip install -r requirements.txt
-ENV CONFIG_PATH=/app/src/config.ini
+ENV CONFIG_PATH=/app/src/config.inils
 
 # 设置环境变量
 ENV PATH="/app/lib:${PATH}"
