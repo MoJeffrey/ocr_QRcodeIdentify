@@ -8,7 +8,7 @@ COPY ./requirements.txt ./
 # 安装所需的依赖
 RUN sed -i 's|http://deb.debian.org/debian|http://mirrors.aliyun.com/debian|g' /etc/apt/sources.list
 RUN sed -i 's|http://security.debian.org/debian-security|http://mirrors.aliyun.com/debian-security|g' /etc/apt/sources.list
-# 安装系统依赖，Todo：目前对系统依赖选择国内镜像的测试，经常出问题，等待后续再测试，或者应用CI缓存的能力
+
 RUN apt-get update && apt-get install -y libgl1-mesa-glx
 
 pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
