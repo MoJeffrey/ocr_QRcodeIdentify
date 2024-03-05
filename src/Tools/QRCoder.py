@@ -51,6 +51,7 @@ class QRCoder(object):
         try:
             results = self.coder.detectAndDecode(gray)[0]
         except Exception as e:
+            logging.error(f'{traceback.print_exc()}')
             return None
 
         if len(results) == 0:

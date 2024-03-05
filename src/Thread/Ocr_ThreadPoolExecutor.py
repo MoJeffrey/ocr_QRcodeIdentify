@@ -22,6 +22,7 @@ class OCR_ThreadPoolExecutor:
 
     @staticmethod
     def ReSetData():
+        logging.info("清除记录")
         OCR_ThreadPoolExecutor.__lock.acquire()
         OCR_ThreadPoolExecutor.__resultSet = SortedSet()
         OCR_ThreadPoolExecutor.__result_dict = {}

@@ -113,13 +113,11 @@ class config(object):
     @staticmethod
     def PrintConfig() -> None:
         logger = logging.getLogger('config')
-        logger.info(f"摄像头参数: {config.RTSP_USERNAME},{config.RTSP_PASSWORD},{config.RTSP_IP},{config.RTSP_PORT}")
-        logger.info(f"接口参数: {config.API_URL_IP},{config.API_URL_PORT},{config.API_URL},{config.API_TIMEOUT}")
-        logger.info(f"REDIS参数: {config.REDIS_HOST},{config.REDIS_PORT},{config.REDIS_DB}")
-        logger.info(f"其他参数：OTHER_PAUSE_TIME: {config.OTHER_PAUSE_TIME}")
-        logger.info(f"其他参数：OTHER_USB_CAM_NUM: {config.OTHER_USB_CAM_NUM}")
-        logger.info(f"其他参数：OTHER_MAX_WORKERS: {config.OTHER_MAX_WORKERS}")
-        logger.info(f"其他参数：OTHER_STORE_FRAME_ENABLED: {config.OTHER_STORE_FRAME_ENABLED}")
+        logger.info(f"USB摄像头: {config.RTSP_URLS}")
+        logger.info(f"数据回传接口: {config.API_WEBSOCKET_URL}")
+        logger.info(f"QRCode模型路径: {config.IMG_QRCODE_MODEL_PATH}")
+        logger.info(f"QRCode: 储存: {config.IMG_SAVE}; 显示: {config.IMG_SHOW}")
+        logger.info(f"QRCode: 上下: {config.IMG_HIGH_QUANTITY} 张; 左右: {config.IMG_WIDTH_QUANTITY}")
         logger.info("====================================================")
 
     def __Analyze(self) -> None:
