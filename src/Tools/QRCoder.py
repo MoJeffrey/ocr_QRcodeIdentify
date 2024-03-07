@@ -1,4 +1,5 @@
 import logging
+import time
 import traceback
 
 import cv2
@@ -46,6 +47,7 @@ class QRCoder(object):
 
         # 如果是绿色 则直接退出
         if QRCoder.Has_Color(hsv, HSVColorEnum.Green.value.lower, HSVColorEnum.Green.value.upper):
+            time.sleep(config.OTHER_PAUSE_TIME)
             return None
 
         try:
