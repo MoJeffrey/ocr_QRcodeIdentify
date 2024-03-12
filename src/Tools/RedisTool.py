@@ -24,30 +24,34 @@ class RedisConnectDTO:
             "port": self.port,
             "db": self.db,
             "password": self.password,
-            "socket_timeout": self.socket_timeout
+            "socket_timeout": self.socket_timeout,
+            "max_connections": config.Sys_MAX_WORKER,
         }
 
 
 class RedisTool:
     __redis_client = None
+    __redis_Pool = None
     __ConnectDTO: RedisConnectDTO = None
     __logger = None
 
     def __init__(self):
+        self.__redis_client = redis.Redis(connection_pool=RedisTool.__redis_Pool)
+
+    @staticmethod
+    def Init():
         RedisTool.__ConnectDTO = RedisConnectDTO()
-        RedisTool.__redis_client = redis.Redis(**RedisTool.__ConnectDTO.get())
+        RedisTool.__redis_Pool = redis.ConnectionPool(**RedisTool.__ConnectDTO.get())
         RedisTool.__logger = logging.getLogger('RedisTools')
 
-    @staticmethod
-    def flush():
-        RedisTool.__redis_client.flushdb()
+    def flush(self):
+        self.__redis_client.flushdb()
         RedisTool.__logger.info('Redis链接成功！清空')
 
-    @staticmethod
-    def connect():
+    def connect(self):
         while True:
             try:
-                if RedisTool.__redis_client.ping():
+                if self.__redis_client.ping():
                     RedisTool.__logger.info('Redis链接成功！')
                     break
             except redis.exceptions.TimeoutError:
@@ -56,14 +60,11 @@ class RedisTool:
                 RedisTool.__logger.info(f'发生Redis错误: {e}')
                 break
 
-    @staticmethod
-    def exists(name) -> bool:
-        return RedisTool.__redis_client.exists(name)
+    def exists(self, name) -> bool:
+        return self.__redis_client.exists(name)
 
-    @staticmethod
-    def set(name, data):
-        RedisTool.__redis_client.set(name, data)
+    def set(self, name, data):
+        self.__redis_client.set(name, data)
 
-    @staticmethod
-    def get(name) -> str:
-        return RedisTool.__redis_client.get(name)
+    def get(self, name) -> str:
+        return self.__redis_client.get(name)

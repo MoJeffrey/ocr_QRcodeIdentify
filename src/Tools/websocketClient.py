@@ -5,6 +5,7 @@ import time
 
 import websocket
 
+from Thread.Ocr_ThreadPoolExecutor import OCR_ThreadPoolExecutor
 from Tools.config import config
 
 
@@ -32,12 +33,18 @@ class websocketClient:
 
     @staticmethod
     def send(msg):
-        logging.info(f"send: {msg}")
-        websocketClient.__client.send(json.dumps(msg))
+        try:
+            websocketClient.__client.send(msg)
+        except Exception as E:
+            pass
 
     @staticmethod
     def on_message(ws, message):
-        pass
+        data = json.loads(message)
+        code = data["code"]
+        if data["action"] == "delete":
+            Results = OCR_ThreadPoolExecutor.DeleteResult(code)
+            OCR_ThreadPoolExecutor.removeSet(Results)
 
     @staticmethod
     def on_error(ws, error):
@@ -45,6 +52,7 @@ class websocketClient:
 
     @staticmethod
     def on_close(ws, close_status_code, msg):
+        OCR_ThreadPoolExecutor.ReSetData()
         websocketClient.Init()
 
     @staticmethod

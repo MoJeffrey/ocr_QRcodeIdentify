@@ -56,6 +56,7 @@ class config(object):
     """
     IMG
     """
+    IMG_QRCODE_MODEL_PATH: str = None
     IMG_HIGH_QUANTITY: int = None
     IMG_WIDTH_QUANTITY: int = None
     IMG_SHOW: bool = None
@@ -93,7 +94,6 @@ class config(object):
         else:
             self.__CONFIG_PATH = ConfigFile
 
-        print(os.getcwd())
         if os.path.exists(self.__CONFIG_PATH):
             self.__File = configparser.ConfigParser()
             self.__File.read(self.__CONFIG_PATH, encoding="utf-8")
@@ -113,13 +113,11 @@ class config(object):
     @staticmethod
     def PrintConfig() -> None:
         logger = logging.getLogger('config')
-        logger.info(f"摄像头参数: {config.RTSP_USERNAME},{config.RTSP_PASSWORD},{config.RTSP_IP},{config.RTSP_PORT}")
-        logger.info(f"接口参数: {config.API_URL_IP},{config.API_URL_PORT},{config.API_URL},{config.API_TIMEOUT}")
-        logger.info(f"REDIS参数: {config.REDIS_HOST},{config.REDIS_PORT},{config.REDIS_DB}")
-        logger.info(f"其他参数：OTHER_PAUSE_TIME: {config.OTHER_PAUSE_TIME}")
-        logger.info(f"其他参数：OTHER_USB_CAM_NUM: {config.OTHER_USB_CAM_NUM}")
-        logger.info(f"其他参数：OTHER_MAX_WORKERS: {config.OTHER_MAX_WORKERS}")
-        logger.info(f"其他参数：OTHER_STORE_FRAME_ENABLED: {config.OTHER_STORE_FRAME_ENABLED}")
+        logger.info(f"USB摄像头: {config.RTSP_URLS}")
+        logger.info(f"数据回传接口: {config.API_WEBSOCKET_URL}")
+        logger.info(f"QRCode模型路径: {config.IMG_QRCODE_MODEL_PATH}")
+        logger.info(f"QRCode: 储存: {config.IMG_SAVE}; 显示: {config.IMG_SHOW}")
+        logger.info(f"QRCode: 上下: {config.IMG_HIGH_QUANTITY} 张; 左右: {config.IMG_WIDTH_QUANTITY}")
         logger.info("====================================================")
 
     def __Analyze(self) -> None:
@@ -131,6 +129,7 @@ class config(object):
         self.__Analyze_API()
         self.__Analyze_OTHER()
         self.__Analyze_REDIS()
+        self.__Analyze_Sys()
         self.__Analyze_IMG()
 
     def __Analyze_RTSP(self) -> None:
@@ -197,15 +196,17 @@ class config(object):
         config.IMG_WIDTH_QUANTITY = IMGConfig.getint('WIDTH_QUANTITY')
         config.IMG_SHOW = IMGConfig.getboolean('SHOW')
         config.IMG_SAVE = IMGConfig.getboolean('SAVE')
+        config.IMG_QRCODE_MODEL_PATH = IMGConfig.get('QRCODE_MODEL_PATH')
 
         config.IMG_HIGH_Quantity = int(os.environ.get('IMG_HIGH_QUANTITY', config.IMG_HIGH_QUANTITY))
         config.IMG_WIDTH_Quantity = int(os.environ.get('IMG_WIDTH_QUANTITY', config.IMG_WIDTH_QUANTITY))
         config.IMG_SHOW = bool(os.environ.get('IMG_SHOW', config.IMG_SHOW))
         config.IMG_SAVE = bool(os.environ.get('IMG_SAVE', config.IMG_SAVE))
+        config.IMG_QRCODE_MODEL_PATH = os.environ.get('IMG_QRCODE_MODEL_PATH', config.IMG_QRCODE_MODEL_PATH)
 
     def __Analyze_Sys(self) -> None:
         SysConfig = self.__File['Sys']
-        config.Sys_LOG_INFO = SysConfig.getint('LOG_INFO')
+        config.Sys_LOG_INFO = SysConfig.getboolean('LOG_INFO')
         config.Sys_MAX_WORKER = SysConfig.getint('MAX_WORKER')
 
         config.Sys_LOG_INFO = bool(os.environ.get('Sys_LOG_INFO', config.Sys_LOG_INFO))

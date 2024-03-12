@@ -1,9 +1,6 @@
 import logging
 import re
 
-from Tools.config import config
-from Tools.HttpUpload import HttpUpload
-
 
 class QuestionsDTO:
     match_name = None
@@ -15,19 +12,23 @@ class QuestionsDTO:
     def __init__(self, result):
         self.result = result
         self.logger.info = self.passInfo
+        self.identify()
 
     def passInfo(self, msg):
         pass
 
     def identify(self):
-        self.match_name = re.search(r'[QA]\d+', self.result).group()
-        self.data_all_num = int(re.search(r'\[[AQ]\d+_\d+_(\d+)]', self.result).group(1))
-        self.curr_num = int(re.search(r'\[[AQ]\d+_(\d+)_\d+]', self.result).group(1))
-        self.logger.info(f'已截取问题编号及片段编号')
+        try:
+            self.match_name = re.search(r'[QACE]\d+', self.result).group()
+            self.data_all_num = int(re.search(r'\[[AQCE]\d+_\d+_(\d+)]', self.result).group(1))
+            self.curr_num = int(re.search(r'\[[AQCE]\d+_(\d+)_\d+]', self.result).group(1))
+            self.logger.info(f'已截取问题编号及片段编号')
+        except Exception:
+            self.logger.error(self.result)
 
     @staticmethod
     def splicing(current_data_list: list) -> str:
-        sorted_data = sorted(current_data_list, key=lambda x: int(re.search(r'\[[AQ]\d+_(\d+)_\d+]', x).group(1)))
+        sorted_data = sorted(current_data_list, key=lambda x: int(re.search(r'\[[AQCE]\d+_(\d+)_\d+]', x).group(1)))
         return ''.join([d[d.index(']') + 1:] for d in sorted_data])
 
 if __name__ == '__main__':
